@@ -6,7 +6,7 @@
 
 - `config.py`: Put all parameters for input data preparation, and model architectures as well as hyperparamters.
 - `main_preparation.py`: Prepare input data, basically it splits the total dataset into training and test set (dev set) randomly. The train set and test set follow similar 
-distribution. It will generates valid data list that is convenient for data tracing. You need set proper data path to load input data after [data processing step](https://github.com/binxi0629/BS2layergroup/new/main/processing).
+distribution. It will generates valid data list that is convenient for data tracing. You need set proper data path to load input data after [data processing step](https://github.com/binxi0629/BS2layergroup/tree/main/processing).
 - `main_bs2lg.py`: Main script for model training, it will load both model architecture and hyperparameters from `config.py`, so give a proper setting there.
 - `function_list`: Functions stored for data preparation use.
 - `function_training`: Functions used for training and test model.
