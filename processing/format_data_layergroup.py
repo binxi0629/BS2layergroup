@@ -1,15 +1,16 @@
 import layergroup
 
 import numpy as np
-import os, json
+import os, json, re
+import random
 
-
+from copy import copy,deepcopy
 
 class LayerBands:
 
     _root_save_path = "../../input_data/energy_separation01/"
-    def __init__(self, jsonbands, file_path):
 
+    def __init__(self, jsonbands, file_path):
 
         if jsonbands is not None:
             self.json_data = jsonbands
@@ -30,6 +31,8 @@ class LayerBands:
         self.kps = np.array(self.json_data["bands"]["nonsoc_energies"]["kpath"]["kpoints"])
         self.num_all_kps, _ = self.kps.shape
         self.kps_labels = self.json_data["bands"]["nonsoc_energies"]["koints_labels"]
+        self.special_kps_list = self.json_data["bands"]["nonsoc_energies"]["special_points"]
+        self.labels_idx = self.position_high_symmetry_kps()
 
         self.is_spin_polarized = self.json_data["bands"]["nonsoc_energies"]["is_spinpolarized"]
         self.nonsoc_energies = np.array(self.json_data["bands"]["nonsoc_energies"]["bands"])
@@ -52,9 +55,182 @@ class LayerBands:
             spin_down_bands = spin_up_bands
         return spin_up_bands, spin_down_bands
 
-    #TODO: Set different number of kps here
+    # TODO: Set different number of kps here
     def get_num_kps(self):
         return self.num_all_kps
+
+    def position_high_symmetry_kps(self):
+
+        torlence = 1e-6
+        labels_idx = []
+
+        def labels2label_list(labels:str):
+            label_list = re.findall("\w\d|\w", labels)
+            return label_list
+
+        label_list = labels2label_list(self.kps_labels)
+
+        for each in label_list:
+            this_label = [each]
+            k_pos = np.array([self.special_kps_list[each]["__ndarray__"][2]])
+
+            tmp_list = np.array(np.absolute([self.kps - k_pos]) <= torlence)
+            tmp_list = np.reshape(tmp_list, (400, 3))
+            tmp_list = np.sum(tmp_list, axis=1, keepdims=False)
+
+            for idx, i in enumerate(tmp_list):
+                if i == 3:
+                    this_label.append(idx)
+
+            labels_idx.append(this_label)
+            del this_label
+
+        start_idx = 0
+        paths = []
+        for i in range(len(labels_idx)):
+            for j in range(len(labels_idx[i])):
+                if j != 0:
+                    if labels_idx[i][j] >= start_idx:
+                        start_idx = labels_idx[i][j]
+                        paths.append([labels_idx[i][0], start_idx])
+                        break
+
+        return paths
+
+    def special_kps_separation(self, num_kps, strategy=None):
+        """
+            Shrink k points dimension from 400 to num_kps
+        """
+        num_paths = len(self.labels_idx) - 1
+
+        def equalInervalIdxSplitting(start_idx:int, end_idx:int,num_idx:int):
+            """
+                Equal interval shrinking: int: (end_idx-start_idx-1)/num_idx
+            """
+            interval = end_idx-start_idx-1
+            idx_list = []
+
+            if interval<num_idx-2:
+                raise IndexError(f"Index received max number: {interval+1}, but got {num_idx}")
+            elif 0 == interval:
+                return [start_idx]
+            else:
+                itv = int(interval/num_idx)
+                for i in range(num_idx-1):
+                    idx_list.append(start_idx+itv*i)
+                idx_list.append(end_idx)
+
+            return idx_list
+
+        def default_strategy(required_num,total=400):
+            """
+                Weighted shrinking for each path
+            """
+            tmp = []
+            tmp_sum =0
+            for k in range(num_paths-1):
+                tmp_val=int(required_num*(self.labels_idx[k+1][1]-self.labels_idx[k][1])/total)
+                tmp.append(tmp_val)
+                tmp_sum+=tmp_val
+            tmp.append(required_num-tmp_sum)
+
+            return tmp
+
+        kps_idx = []
+
+        num_idx_list=default_strategy(num_kps)
+
+        for j in range(num_paths):
+            kps_idx.append(equalInervalIdxSplitting(start_idx=self.labels_idx[j][1], end_idx=self.labels_idx[j+1][1], num_idx=num_idx_list[j]))
+
+        # include the last index
+        # kps_idx+=[self.labels_idx[num_paths][1]]
+
+        return kps_idx
+
+    @staticmethod
+    def kpath_shuffle(kpath):
+        """
+            Need deepcopy first
+        """
+        return random.shuffle(kpath)
+
+    # FIXME: data augmentation, still under testing
+    @staticmethod
+    def genShifttingChoice(kpaths, shiftting_rate):
+        num_paths = len(kpaths)
+        criteria_list = []
+
+        for i in range(num_paths):
+            num = int(shiftting_rate *len(kpaths[i]))
+            # print("nunm:",num)
+            criteria_list.append([-num, num])
+
+        def genNrandomInts(num_rands, crteria):
+            choice = []
+            for i in range(num_rands):
+                choice.append(random.randint(crteria[i][0], crteria[i][1]))
+            return choice
+
+        choice = genNrandomInts(num_paths - 1, criteria_list)
+
+        target_list = []
+
+        for i in range(criteria_list[-1][0], criteria_list[-1][1]):
+            target_list.append(i)
+
+        while -1 * sum(choice) not in target_list:
+            choice = genNrandomInts(num_paths - 1, criteria_list)
+
+        choice += [-1 * sum(choice)]
+        return choice
+
+    @staticmethod
+    def appendRemoveList(target_list, num,add=False):
+        list_temp = deepcopy(target_list)
+        max_idx = len(list_temp)
+        # print(">>>",max_idx)
+        count = 0
+        if add:
+            while count != num:
+                idx = random.randint(1,max_idx-2)
+                if list_temp[idx]-list_temp[idx-1] >=2:
+                    val = list_temp[idx-1]+int((list_temp[idx+1]-list_temp[idx])/2)
+                    list_temp.insert(idx,val)
+                    max_idx += 1
+                    count += 1
+        else:
+            while count != num:
+                if max_idx > 1:
+                    list_temp.pop(random.randint(1,max_idx-2))
+                    max_idx -= 1
+                    count += 1
+        # print(list_temp)
+        return list_temp
+
+    @staticmethod
+    def produceNewKpsIdxFromShuffledKpath(kpaths, num_examples, shiftting_rate=0.4):
+        n_paths = []
+        for each in range(num_examples):
+            list_a = deepcopy(kpaths)
+            new_kpaths = []
+            choice = LayerBands.genShifttingChoice(kpaths, shiftting_rate)
+            # print(choice)
+            for idx, i in enumerate(choice):
+                if 0 == i:
+                    new_kpaths.append(list_a[idx])
+                    # print(0)
+                elif i < 0:
+                    # print(list_a[idx][-1]-list_a[idx][0])
+                    new_kpaths.append(LayerBands.appendRemoveList(list_a[idx], -i, add=False))
+                    # print(-1)
+                else:
+                    new_kpaths.append(LayerBands.appendRemoveList(list_a[idx], i, add=True))
+                    # print(1)
+            n_paths.append(new_kpaths)
+            del list_a, new_kpaths
+
+        return n_paths
 
     @staticmethod
     def energy_separation(formatted_bands, padded_number=0):
