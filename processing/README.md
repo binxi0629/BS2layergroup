@@ -16,7 +16,7 @@ into desired input band format.
 - `lg_distribution.json`: Layer group population list.
 
 ### Design your own input format
-1. Add your customize methods into `LayerBands` class of `format_data_layergroup.py`.
+1. Add your customized methods into `LayerBands` class of `format_data_layergroup.py`.
 2. Call the function inside `processing(args)` of `loadLayerData.py`
 
 
