@@ -140,7 +140,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
                     # >>>step 5. Data augmentation
                     if do_agumentation:
-                        kpaths_backup = kpaths
+                        kpaths_backup = deepcopy(kpaths)
 
                         # 5.a if need augmenattion
                         if lg_population_list[this_datum.layergroup_num - 1] < agmentation_class_limit:
