@@ -70,6 +70,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
             layer_data = {}
 
             with open(os.path.join(raw_data_dir, file), 'r') as jsonf:
+                # print(f"file name {file}")
                 json_data = json.load(jsonf)
 
             this_datum = format_data_layergroup.LayerBands(jsonbands=json_data, file_path=save_dir)
@@ -143,6 +144,9 @@ def processing(save_dir="../../input_data/energy_separation01/",
                         kpaths_backup = deepcopy(kpaths)
 
                         # 5.a if need augmenattion
+                        # print (f"this_datum.layergroup_num - 1 :{this_datum.layergroup_num - 1}")
+                        # print (f"lg_population_list: {np.array(lg_population_list).shape}")
+                        # print (lg_population_list)
                         if lg_population_list[this_datum.layergroup_num - 1] < agmentation_class_limit:
                             num_agumentation = agmentation_class_limit - lg_population_list[
                                 this_datum.layergroup_num - 1]
@@ -209,6 +213,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
                     layer_data["new_label"] = new_label
                     layer_data["kpoints"] = this_datum.kps
+                    # layer_data["kpoints_number"] = this_datum.kps.shape
                     layer_data["k_labels"] = this_datum.labels_idx
 
                     # bands and k points
@@ -217,6 +222,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     if this_datum.agumented_num != 0:
                         for i in range(this_datum.agumented_num):
                             layer_data["k_idx"] = temp_kps_list_list[i]
+                            layer_data["shrinked_kpoint_numbers"] = np.array(layer_data["k_idx"]).shape[0]
                             layer_data["spin_up_bands"] =agumented_spinup_bands[i]
                             layer_data["spin_down_bands"] = agumented_spindown_bands[i]
                             file_name = this_datum.uid+'f_{i}.json'
@@ -230,11 +236,11 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     # layer_data["soc_bands"]
 
                         layer_data["k_idx"] = kps_list
+                        layer_data["shrinked_kpoint_numbers"] = np.array(layer_data["k_idx"]).shape[0]
                         valid_count += 1
-
+                        
                         with open(os.path.join(save_dir, file), 'w') as jf:
                             json.dump(layer_data, jf, cls=format_data_layergroup.NumpyEncoder, indent=2)
-
                     # print(f"\r\t FINISHED: COUNT: {count}|VALID: {valid_count}|TOTAL: {total_count}", end=' ')
 
                     del new_label
@@ -248,8 +254,8 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
 
 def test():
-    processing(save_dir="../input_test/",
-               raw_data_dir="../c2db_database_test/",
+    processing(save_dir="../../c2db_database_test_output/",
+               raw_data_dir="../../c2db_database_test_input/",
                num_of_bands=60,
                num_of_kps=100,
                degeneracy=True,
