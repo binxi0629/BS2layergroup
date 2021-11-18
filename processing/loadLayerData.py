@@ -201,7 +201,12 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     layer_data["atoms_type"] = this_datum.atoms_type
                     layer_data["lattice"] = this_datum.lattice
                     layer_data["positions"] = this_datum.positions
+                    layer_data["layers_num"] = this_datum.layers_num
                     layer_data["layergroup_number"] = this_datum.layergroup_num
+                    
+                    layer_data["spacegroup"] = this_datum.spacegroup
+                    layer_data["spacegroup_num"] = this_datum.spacegroup_num
+
                     layer_data["new_label"] = new_label
                     layer_data["kpoints"] = this_datum.kps
                     layer_data["k_labels"] = this_datum.labels_idx
@@ -256,7 +261,7 @@ def test():
                is_soc=False,
                bands_below_fermi_limit=40,
                layer_norm=False,
-               layergroup_lower_bound=-1,
+               layergroup_lower_bound=10,
                energy_scale=10.,
                shift=1.,
                kpaths_shuffle=True,

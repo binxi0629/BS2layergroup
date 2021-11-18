@@ -24,6 +24,12 @@ class LayerBands:
         self.formula = self.json_data["structure"]["formula"]
         self.atoms_type = self.json_data["structure"]["atom_types"]
         self.positions = np.array(self.json_data["structure"]["position"])
+
+        # need test
+        z_position = np.array([atom_position[2] for atom_position in self.positions])
+        z_position = z_position.round(decimals=2)
+        self.layers_num = len(np.unique(z_position, return_counts=True)[0])  
+
         self.spacegroup = self.json_data["structure"]["spacegroup"]
         self.spacegroup_num = self.json_data["structure"]["spacegroup_number"]
         self.lattice = self.json_data["structure"]["lattice"]
