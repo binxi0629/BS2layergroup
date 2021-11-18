@@ -1,4 +1,4 @@
-loadLayerData.pyimport format_data_layergroup
+import format_data_layergroup
 import os, re, json
 import numpy as np
 
@@ -13,12 +13,14 @@ def layergroup_filter(layergroup_lower_bound=-1):
     layergroup_stat = dis["lg_distribution"]
 
     layergroup_list=[]
-    lg_population_list =[]
-    for index, i in enumerate(layergroup_stat):
-        if i >= layergroup_lower_bound:
-            layergroup_list.append(index+1)
-            lg_population_list.append(i)
-    return layergroup_list, lg_population_list
+    if layergroup_lower_bound > 0:
+        for index, i in enumerate(layergroup_stat):
+            if i >= layergroup_lower_bound:
+                layergroup_list.append(index+1)
+    else:
+        layergroup_list = [i for i in range(1, 81)]
+
+    return layergroup_list, layergroup_stat
 
 
 def layerNorm(bands:np.array, energy_scale=10., shift=1.) -> np.array:
@@ -51,12 +53,8 @@ def processing(save_dir="../../input_data/energy_separation01/",
                agmentation_class_limit=50, # TODO: No. data to generate
                ag_shiftting_rate=0.4):   # TODO: shiftting rate of kps
 
-    if layergroup_lower_bound > 0:
-        layergroup_list,lg_population_list = layergroup_filter(layergroup_lower_bound)
-    else:
-        layergroup_list = [i for i in range(1,81)]
-        with open("lg_distribution.json", 'r') as lgf:
-            lg_population_list = json.load(lgf)["lg_distribution"]
+
+    layergroup_list,lg_population_list = layergroup_filter(layergroup_lower_bound)
 
     norm_after_padding = False
     count = 0
