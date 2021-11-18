@@ -19,6 +19,7 @@ class LayerBands:
 
         self.uid = self.json_data['uid']
         self.path = file_path
+        self.agumented_num=0
 
         self.formula = self.json_data["structure"]["formula"]
         self.atoms_type = self.json_data["structure"]["atom_types"]
@@ -231,6 +232,18 @@ class LayerBands:
             del list_a, new_kpaths
 
         return n_paths
+
+    @staticmethod
+    def unrollKpath(kpaths):
+        flat_list = [item for sublist in kpaths for item in sublist]
+        return flat_list
+
+    @staticmethod
+    def extractBandsByKpsIdx(formatted_bands,kps_list):
+        formatted_bands=np.array(formatted_bands)
+        extracted_bands = formatted_bands[:,kps_list]
+        return extracted_bands
+
 
     @staticmethod
     def energy_separation(formatted_bands, padded_number=0):
