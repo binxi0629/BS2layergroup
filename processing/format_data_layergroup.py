@@ -129,17 +129,25 @@ class LayerBands:
 
             return idx_list
 
-        def default_strategy(required_num,total=400):
+        def default_strategy(required_num, total=400):
             """
                 Weighted shrinking for each path
             """
             tmp = []
-            tmp_sum =0
-            for k in range(num_paths-1):
-                tmp_val=int(required_num*(self.labels_idx[k+1][1]-self.labels_idx[k][1])/total)
+            tmp_sum = 0
+            no_path_cases = 0
+
+            for k in range(num_paths - 1):
+                tmp_val = int(required_num * (self.labels_idx[k + 1][1] - self.labels_idx[k][1]) / total)
+                if 0 == tmp_val:
+                    no_path_cases += 1
                 tmp.append(tmp_val)
-                tmp_sum+=tmp_val
-            tmp.append(required_num-tmp_sum)
+                tmp_sum += tmp_val
+
+            tmp.append(required_num - tmp_sum)
+
+            for _ in range(no_path_cases):
+                tmp[tmp.index(max(tmp))] -= 1
 
             return tmp
 
