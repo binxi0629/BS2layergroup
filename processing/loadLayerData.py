@@ -51,15 +51,21 @@ def processing(save_dir="../../input_data/energy_separation01/",
                kpaths_shuffle=False,  # TODO: shuffle kpaths
                do_agumentation=False,  # TODO: Data agumentation
                agmentation_class_limit=50, # TODO: No. data to generate
-               ag_shiftting_rate=0.4):   # TODO: shiftting rate of kps
+               ag_shiftting_rate=0.4,   # TODO: shiftting rate of kps
+               debug=False):
 
+    # FIXME: When not debugging, set debug to False
+    debug = False
 
     layergroup_list,lg_population_list = layergroup_filter(layergroup_lower_bound)
+
+    if debug:
+        print("No. Valid layer groups: {}".format(len(layergroup_list)))
 
     norm_after_padding = False
     count = 0
     valid_count = 0
-    ag_count =0
+    ag_data_count =0
 
     for dirs, subdirs, files in os.walk(raw_data_dir):
         total_count = len(files)
@@ -73,30 +79,40 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
             this_datum = format_data_layergroup.LayerBands(jsonbands=json_data, file_path=save_dir)
 
-            # >>>step 1: Check the population
+            # TODO: step 1: Check the population
             if this_datum.layergroup_num in layergroup_list:
                 new_label = layergroup_list.index(this_datum.layergroup_num)
 
                 if not is_soc:
                     spinup_bands = this_datum.spinup_bands.T  # FIXME  No. bands X No. kps
                     spindown_bands = this_datum.spindown_bands.T
+
+                    # FIXME: to be developed
                     is_spin_polarized = this_datum.is_spin_polarized
 
-
-                    # >>>step 2: Find fermi level
+                    # TODO: step 2: Find fermi level
                     try:
                         fermi_level_spinup = format_data_layergroup.LayerBands.find_fermi_index(spinup_bands)
                         fermi_level_spindown = format_data_layergroup.LayerBands.find_fermi_index(spindown_bands)
+
+                        if debug:
+                            print("Shape of raw spin-up bands: {}".format(spinup_bands.shape))
+                            print("Shape of raw spin-down bands: {}".format(spindown_bands.shape))
+                            print("Fermi level of Spin-up bands is at: {}".format(fermi_level_spinup))
+                            print("Fermi level of Spin-down bands is at: {}".format(fermi_level_spindown))
+
                     except IndexError as e:
                         print(this_datum.uid)
                         raise e
-                    # >>>step 3:  Process by degeneracy or energy separation
+
+                    # TODO: step 3:  Process by degeneracy or energy separation
                     if degeneracy:
                         tranformed_spinup_bands = format_data_layergroup.LayerBands.degen_translate(spinup_bands, en_tolerance=en_tolerance)
                         tranformed_spindown_bands = format_data_layergroup.LayerBands.degen_translate(spindown_bands, en_tolerance=en_tolerance)
+
                     elif energy_separation:
 
-                        # >>>step 3.a: normalization
+                        # TODO: step 3.a: normalization
                         if layer_norm:
                             if norm_before_padding:
                                 # normalize the energy difference to a scale
@@ -104,16 +120,19 @@ def processing(save_dir="../../input_data/energy_separation01/",
                                 spindown_bands = layerNorm(spindown_bands, energy_scale, shift=shift)
                             else:
                                 norm_after_padding = True
-
                         tranformed_spinup_bands = format_data_layergroup.LayerBands.energy_separation(spinup_bands, padded_number=padding_num)
                         tranformed_spindown_bands = format_data_layergroup.LayerBands.energy_separation(spindown_bands, padded_number=padding_num)
                     else:
-                        #TODO: new function to be developed here
+                        #TODO: new function to be developed here for Spin-coupling effect
                         tranformed_spinup_bands = None
                         tranformed_spindown_bands = None
 
                     if tranformed_spinup_bands is None:
                         raise Exception("Neither gegeneracy nor energy separation is opted")
+
+                    if debug:
+                        print("Shape of spin-up bands after degeneracy or energy separation: {}".format(tranformed_spinup_bands.shape))
+                        print("Shape of spin-down bands after degeneracy or energy separation: {}".format(tranformed_spindown_bands.shape))
 
                     padded_spinup_bands = this_datum.padding_around_fermi(formatted_bands=tranformed_spinup_bands,
                                                                           num_of_bands=num_of_bands,
@@ -127,21 +146,25 @@ def processing(save_dir="../../input_data/energy_separation01/",
                                                                             padding_num=padding_num,
                                                                             fermi_index=fermi_level_spindown)
 
-                    # >>>step 3.a: normalization
+                    if debug:
+                        print("Shape of Spin-up bands aftering padding: {}".format(padded_spinup_bands.shape))
+                        print("Shape of Spin-down bands aftering padding: {}".format(padded_spindown_bands.shape))
+
+                    # TODO: step 3.a: normalization
                     if layer_norm:
                         if norm_after_padding:
                             # normalize the energy difference to a scale
                             padded_spinup_bands = layerNorm(padded_spinup_bands, energy_scale, shift=shift)
                             padded_spindown_bands = layerNorm(padded_spindown_bands, energy_scale, shift=shift)
 
-                    # >>>step 4. shrink the dimension of kps
+                    # TODO: step 4. shrink the dimension of kps
                     kpaths = this_datum.special_kps_separation(num_of_kps)
 
-                    # >>>step 5. Data augmentation
+                    # TODO: step 5. Data augmentation
                     if do_agumentation:
                         kpaths_backup = deepcopy(kpaths)
 
-                        # 5.a if need augmenattion
+                        # TODO: 5.a if need augmenattion
                         # print (f"this_datum.layergroup_num - 1 :{this_datum.layergroup_num - 1}")
                         # print (f"lg_population_list: {np.array(lg_population_list).shape}")
                         # print (lg_population_list)
@@ -153,7 +176,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
                             agumented_spinup_bands = []
                             agumented_spindown_bands = []
 
-                            # 5.b generate new paths
+                            # TODO: 5.b generate new paths
                             new_paths_list = format_data_layergroup.LayerBands.produceNewKpsIdxFromShuffledKpath(
                                 kpaths_backup,
                                 num_agumentation,
@@ -180,21 +203,11 @@ def processing(save_dir="../../input_data/energy_separation01/",
                         padded_spinup_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spinup_bands, kps_list)
                         padded_spindown_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spindown_bands, kps_list)
 
-                        # TODO: uncomment for debugging
-                        # print(padded_spinup_bands.shape)
-                        # print(padded_spindown_bands.shape)
+                        if debug:
+                            print("Spin-up bands shape after kpaths shuffling:", padded_spinup_bands.shape)
+                            print("Spin-down bands shape after kpaths shuffling:",padded_spindown_bands.shape)
 
-                    # #FIXME: debugging use
-                    # print(file)
-                    # print("Spin-up bands: ",padded_spinup_bands.shape)
-                    # print("Spin-down bands: ", padded_spindown_bands.shape)
-                    # print("Layer group:",this_datum.layergroup_num)
-                    #
-                    # print("Spin-up bands")
-                    # print(padded_spinup_bands)
-                    # print("----------------------------------------------------------")
-
-                    # >>>step 4: save
+                    # TODO: step 4: save
                     # monolayer structure
                     layer_data["uid"] = this_datum.uid
                     layer_data["formula"] = this_datum.formula
@@ -218,6 +231,12 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     layer_data["is_spin_polarized"] = this_datum.is_spin_polarized
 
                     if this_datum.agumented_num != 0:
+                        ag_data_count += this_datum.agumented_num-1
+
+                        valid_count += 1
+                        if debug:
+                            print("Augmentation: {}".format(this_datum.agumented_num))
+
                         for i in range(this_datum.agumented_num):
                             layer_data["k_idx"] = temp_kps_list_list[i]
                             layer_data["shrinked_kpoint_numbers"] = np.array(layer_data["k_idx"]).shape[0]
@@ -226,7 +245,12 @@ def processing(save_dir="../../input_data/energy_separation01/",
                             file_name = this_datum.uid+'f_{i}.json'
                             with open(os.path.join(save_dir, file_name), 'w') as jf:
                                 json.dump(layer_data, jf, cls=format_data_layergroup.NumpyEncoder, indent=2)
-                            ag_count+=1
+
+                            if debug:
+                                print("\t---------------------------------------------------------")
+                                print(f"\t the {i} Augmented spin-up bands shape: {agumented_spinup_bands[i].shape}")
+                                print(f"\t the {i} Augmented spin-down bands shape: {agumented_spindown_bands[i].shape}")
+                                print("\t---------------------------------------------------------")
                     else:
                         layer_data["spin_up_bands"] = padded_spinup_bands
                         layer_data["spin_down_bands"] = padded_spindown_bands
@@ -246,7 +270,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
             del layer_data
             count += 1
 
-        print(f"\n Valid: {valid_count} | Augmented: {ag_count} |Total: {total_count}")
+        print(f"\n Valid: {valid_count} | Augmented: {ag_data_count} |Total: {total_count}")
         print("Valid Layer groups:",layergroup_list)
         print(f"Successfully saved into {save_dir} ")
 
@@ -272,7 +296,8 @@ def test():
                do_agumentation=True,
                agmentation_class_limit=20,
                ag_shiftting_rate=0.4,
-               norm_before_padding=False)
+               norm_before_padding=False,
+               debug=False)
 
 test()
 
