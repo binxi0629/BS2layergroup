@@ -328,9 +328,6 @@ class LayerBands:
                 fermi_index = j
                 # print(j)
                 return fermi_index
-            else:
-                return bands_num
-
 
     def vb_count(self, formatted_bands, fermi_index: int):
         return fermi_index + 1
