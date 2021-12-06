@@ -1,5 +1,5 @@
 import format_data_layergroup
-import os, re, json
+import os, re, json, math
 import numpy as np
 
 from copy import deepcopy, copy
@@ -51,13 +51,13 @@ def processing(save_dir="../../input_data/energy_separation01/",
                kpaths_shuffle=False,  # TODO: shuffle kpaths
                do_agumentation=False,  # TODO: Data agumentation
                agmentation_class_limit=50, # TODO: No. data to generate
-               ag_shiftting_rate=0.4,   # TODO: shiftting rate of kps
+               ag_shiftting_rate=0.4, # TODO: shiftting rate of kps
                debug=False):
 
     # FIXME: When not debugging, set debug to False
-    debug = False
+    # debug = False
 
-    layergroup_list,lg_population_list = layergroup_filter(layergroup_lower_bound)
+    layergroup_list, lg_population_list = layergroup_filter(layergroup_lower_bound)
 
     if debug:
         print("No. Valid layer groups: {}".format(len(layergroup_list)))
@@ -102,7 +102,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
                             print("Fermi level of Spin-down bands is at: {}".format(fermi_level_spindown))
 
                     except IndexError as e:
-                        print(this_datum.uid)
+                        print("Fermi level not found for",this_datum.uid)
                         raise e
 
                     # TODO: step 3:  Process by degeneracy or energy separation
@@ -128,7 +128,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
                         tranformed_spindown_bands = None
 
                     if tranformed_spinup_bands is None:
-                        raise Exception("Neither gegeneracy nor energy separation is opted")
+                        raise Exception("Neither degeneracy nor energy separation is opted")
 
                     if debug:
                         print("Shape of spin-up bands after degeneracy or energy separation: {}".format(tranformed_spinup_bands.shape))
@@ -169,8 +169,9 @@ def processing(save_dir="../../input_data/energy_separation01/",
                         # print (f"lg_population_list: {np.array(lg_population_list).shape}")
                         # print (lg_population_list)
                         if lg_population_list[this_datum.layergroup_num - 1] < agmentation_class_limit:
-                            num_agumentation = agmentation_class_limit - lg_population_list[
-                                this_datum.layergroup_num - 1]
+                            num_this_lg = lg_population_list[this_datum.layergroup_num - 1]
+                            num_agumentation = math.ceil((agmentation_class_limit -num_this_lg)/num_this_lg)
+
                             this_datum.agumented_num = num_agumentation
                             temp_kps_list_list = []
                             agumented_spinup_bands = []
@@ -216,7 +217,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     layer_data["atoms_type"] = this_datum.atoms_type
                     layer_data["lattice"] = this_datum.lattice
                     layer_data["positions"] = this_datum.positions
-                    layer_data["layers_num"] = this_datum.layers_num
+                    # layer_data["layers_num"] = this_datum.layers_num
                     layer_data["layergroup_number"] = this_datum.layergroup_num
                     
                     layer_data["spacegroup"] = this_datum.spacegroup
@@ -231,9 +232,8 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     layer_data["is_spin_polarized"] = this_datum.is_spin_polarized
 
                     if this_datum.agumented_num != 0:
-                        ag_data_count += this_datum.agumented_num-1
+                        ag_data_count += this_datum.agumented_num
 
-                        valid_count += 1
                         if debug:
                             print("Augmentation: {}".format(this_datum.agumented_num))
 
@@ -242,27 +242,27 @@ def processing(save_dir="../../input_data/energy_separation01/",
                             layer_data["shrinked_kpoint_numbers"] = np.array(layer_data["k_idx"]).shape[0]
                             layer_data["spin_up_bands"] =agumented_spinup_bands[i]
                             layer_data["spin_down_bands"] = agumented_spindown_bands[i]
-                            file_name = this_datum.uid+'f_{i}.json'
+                            file_name ="c2db_"+this_datum.uid+f'_{i+1}.json'
                             with open(os.path.join(save_dir, file_name), 'w') as jf:
                                 json.dump(layer_data, jf, cls=format_data_layergroup.NumpyEncoder, indent=2)
 
                             if debug:
                                 print("\t---------------------------------------------------------")
-                                print(f"\t the {i} Augmented spin-up bands shape: {agumented_spinup_bands[i].shape}")
-                                print(f"\t the {i} Augmented spin-down bands shape: {agumented_spindown_bands[i].shape}")
+                                print(f"\t the {i+1} Augmented spin-up bands shape: {agumented_spinup_bands[i].shape}")
+                                print(f"\t the {i+1} Augmented spin-down bands shape: {agumented_spindown_bands[i].shape}")
                                 print("\t---------------------------------------------------------")
-                    else:
-                        layer_data["spin_up_bands"] = padded_spinup_bands
-                        layer_data["spin_down_bands"] = padded_spindown_bands
+
+                    layer_data["spin_up_bands"] = padded_spinup_bands
+                    layer_data["spin_down_bands"] = padded_spindown_bands
 
                     # layer_data["soc_bands"]
 
-                        layer_data["k_idx"] = kps_list
-                        layer_data["shrinked_kpoint_numbers"] = np.array(layer_data["k_idx"]).shape[0]
-                        valid_count += 1
-                        
-                        with open(os.path.join(save_dir, file), 'w') as jf:
-                            json.dump(layer_data, jf, cls=format_data_layergroup.NumpyEncoder, indent=2)
+                    layer_data["k_idx"] = kps_list
+                    layer_data["shrinked_kpoint_numbers"] = np.array(layer_data["k_idx"]).shape[0]
+                    valid_count += 1
+
+                    with open(os.path.join(save_dir, file), 'w') as jf:
+                        json.dump(layer_data, jf, cls=format_data_layergroup.NumpyEncoder, indent=2)
                     # print(f"\r\t FINISHED: COUNT: {count}|VALID: {valid_count}|TOTAL: {total_count}", end=' ')
 
                     del new_label
@@ -276,28 +276,28 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
 
 def test():
-    processing(save_dir="../../c2db_database_test_output/",
-               raw_data_dir="../../c2db_database_test_input/",
-               num_of_bands=60,
-               num_of_kps=100,
-               degeneracy=True,
-               energy_separation=False,
-               en_tolerance=0.0005,
+    processing(save_dir="../input_test/",
+               raw_data_dir="../c2db_database_test/",
+               num_of_bands=60,  # <<<
+               num_of_kps=100,  # <<<
+               degeneracy=False,  # <<<
+               energy_separation=True, # <<<
+               en_tolerance=0.0005, # <<<
                padding_around_fermi=True,
                padding_vb_only=False,
-               padding_num=0,
+               padding_num=-15,  # <<<
                is_soc=False,
-               bands_below_fermi_limit=40,
-               layer_norm=False,
-               layergroup_lower_bound=10,
-               energy_scale=10.,
-               shift=1.,
-               kpaths_shuffle=True,
-               do_agumentation=True,
-               agmentation_class_limit=20,
+               bands_below_fermi_limit=40,  # <<<
+               layer_norm=True,  # <<<
+               layergroup_lower_bound=10,  # <<<
+               energy_scale=10.,  # <<<
+               shift=1.,  # <<<
+               kpaths_shuffle=True,  # <<<
+               do_agumentation=True,  # <<<
+               agmentation_class_limit=20, # <<<
                ag_shiftting_rate=0.4,
-               norm_before_padding=False,
-               debug=False)
+               norm_before_padding=True,
+               debug=True)
 
 test()
 
@@ -324,7 +324,12 @@ test()
 #                    num_of_bands=cfg['num_of_bands'],
 #                    bands_below_fermi_limit=cfg['bands_below_fermi_limit'],
 #                    layer_norm=cfg["layer_norm"],
+#                    num_of_kps=cfg["num_of_kps"],
 #                    layergroup_lower_bound=cfg["layergroup_lower_bound"],
 #                    energy_scale=cfg["energy_scale"],
 #                    shift =cfg["shift"],
-#                    norm_before_padding=cfg["norm_before_padding"])
+#                    norm_before_padding=cfg["norm_before_padding"],
+#                    kpaths_shuffle=cfg["kpaths_shuffle"],
+#                    do_agumentation=cfg["do_agumentation"],
+#                    agmentation_class_limit=cfg["agmentation_class_limit"],
+#                    ag_shiftting_rate=cfg["ag_shiftting_rate"])
