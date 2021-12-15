@@ -198,15 +198,20 @@ def processing(save_dir="../../input_data/energy_separation01/",
                     if kpaths_shuffle:
                         # shuffle ordering of kpaths
                         format_data_layergroup.LayerBands.kpath_shuffle(kpaths)
-
                         kps_list = format_data_layergroup.LayerBands.unrollKpath(kpaths)
 
-                        padded_spinup_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spinup_bands, kps_list)
-                        padded_spindown_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spindown_bands, kps_list)
-
                         if debug:
-                            print("Spin-up bands shape after kpaths shuffling:", padded_spinup_bands.shape)
-                            print("Spin-down bands shape after kpaths shuffling:",padded_spindown_bands.shape)
+                            print("No. Kps:", len(kps_list))
+                            print("kps:", kps_list)
+                    else:
+                        kps_list = format_data_layergroup.LayerBands.unrollKpath(kpaths)
+
+                    padded_spinup_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spinup_bands, kps_list)
+                    padded_spindown_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spindown_bands, kps_list)
+
+                    if debug:
+                        print("Spin-up bands shape after kpaths shuffling:", padded_spinup_bands.shape)
+                        print("Spin-down bands shape after kpaths shuffling:",padded_spindown_bands.shape)
 
                     # TODO: step 4: save
                     # monolayer structure
