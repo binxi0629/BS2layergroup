@@ -4,10 +4,13 @@ args = {
         "load": {
             "start": True,
             "numBands": 60,
-            "load_from_dir": "../input_data/energy_separation03/",
-            "group_type": "layergroup",
-            "numClasses": 20,
+            # "load_from_dir": "../input_data/energy_separation03/",
+            "load_from_dir": "../../c2db_database02_output_degeneracy/",
+            # "group_type": "layernumbers",
+            "group_type": "new_label", # for file naming only
+            "numClasses": 5,
             "num_upper_bound": 1000,
+            # "num_upper_bound": 200,
             "num_lower_bound": 0,
             "seed": None,
         }
@@ -18,29 +21,258 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 import tensorflow as tf
 
 # TODO:Deep learning model
+
+## 86
 MLP_model = [
-    tf.keras.layers.Flatten(input_shape=(60, 400)),
+    tf.keras.layers.Flatten(input_shape=(60, 100)),
+    # tf.keras.layers.Flatten(input_shape=(60, 400)),
     tf.keras.layers.LeakyReLU(),
-    tf.keras.layers.Dense(10000, use_bias=True, bias_initializer='zeros',
-                          kernel_regularizer=tf.keras.regularizers.L1(0.3),
-                          activity_regularizer=tf.keras.regularizers.L2(0.3)),
-    tf.keras.layers.LeakyReLU(),
-    tf.keras.layers.Dropout(0.3),
-    tf.keras.layers.Dense(4096, use_bias=True, bias_initializer='zeros',
-                          kernel_regularizer=tf.keras.regularizers.L1(0.7),
-                          activity_regularizer=tf.keras.regularizers.L2(0.3)),
+
+    tf.keras.layers.Dense(3125, use_bias=True, bias_initializer='zeros',),
     tf.keras.layers.LeakyReLU(),
     tf.keras.layers.Dropout(0.3),
-    tf.keras.layers.Dense(1024, use_bias=True, bias_initializer='zeros',
-                          kernel_regularizer=tf.keras.regularizers.L1(0.7),
-                          activity_regularizer=tf.keras.regularizers.L2(0.3)),
+
+    # tf.keras.layers.Dense(2000, use_bias=True, bias_initializer='zeros',),
+    # tf.keras.layers.LeakyReLU(),
+    # tf.keras.layers.Dropout(0.3),
+
+
+    # tf.keras.layers.Dense(625, use_bias=True, bias_initializer='zeros',),
+    # tf.keras.layers.LeakyReLU(),
+    # tf.keras.layers.Dropout(0.3),
+
+    tf.keras.layers.Dense(125, use_bias=True, bias_initializer='zeros',),
     tf.keras.layers.LeakyReLU(),
-    tf.keras.layers.Dense(256, use_bias=True, bias_initializer='zeros',
-                          kernel_regularizer=tf.keras.regularizers.L1(0.7),
-                          activity_regularizer=tf.keras.regularizers.L2(0.3)),
-    tf.keras.layers.LeakyReLU(),
-    tf.keras.layers.Dense(20),
+
+
+    tf.keras.layers.Dense(5),
 ]
+
+# # # 88
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(3125, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     # tf.keras.layers.Dense(2000, use_bias=True, bias_initializer='zeros',),
+#     # tf.keras.layers.LeakyReLU(),
+#     # tf.keras.layers.Dropout(0.3),
+
+
+#     # tf.keras.layers.Dense(625, use_bias=True, bias_initializer='zeros',),
+#     # tf.keras.layers.LeakyReLU(),
+#     # tf.keras.layers.Dropout(0.3),
+
+#     tf.keras.layers.Dense(125, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+
+
+#     tf.keras.layers.Dense(5),
+# ]
+
+# ## 87
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(3125, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     # tf.keras.layers.Dense(2000, use_bias=True, bias_initializer='zeros',),
+#     # tf.keras.layers.LeakyReLU(),
+#     # tf.keras.layers.Dropout(0.3),
+
+
+#     tf.keras.layers.Dense(625, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     tf.keras.layers.Dense(125, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+
+
+#     tf.keras.layers.Dense(5),
+# ]
+
+# # 86% accuracy
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(3000, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     # tf.keras.layers.Dense(2000, use_bias=True, bias_initializer='zeros',),
+#     # tf.keras.layers.LeakyReLU(),
+#     # tf.keras.layers.Dropout(0.3),
+
+
+#     tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(5),
+# ]
+
+## 86% accuracy
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(5000, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     # tf.keras.layers.Dense(2000, use_bias=True, bias_initializer='zeros',),
+#     # tf.keras.layers.LeakyReLU(),
+#     # tf.keras.layers.Dropout(0.3),
+
+
+#     tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(5),
+# ]
+
+## 84% accuracy
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(5000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     tf.keras.layers.Dense(2000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+
+#     tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(5),
+# ]
+
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+
+#     tf.keras.layers.Dense(1000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+
+#     tf.keras.layers.Dense(256, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(20),
+# ]
+
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(3000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+#     tf.keras.layers.Dense(1000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     # tf.keras.layers.Dropout(0.3),
+#     # tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',
+#     #                       kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#     #                       activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     # tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(256, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(20),
+# ]
+
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(3000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+#     tf.keras.layers.Dense(1500, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+#     tf.keras.layers.Dense(512, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(256, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(20),
+# ]
+
+# MLP_model = [
+#     tf.keras.layers.Flatten(input_shape=(60, 100)),
+#     # tf.keras.layers.Flatten(input_shape=(60, 400)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(10000, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+#     tf.keras.layers.Dense(4096, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dropout(0.3),
+#     tf.keras.layers.Dense(1024, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(256, use_bias=True, bias_initializer='zeros',
+#                           kernel_regularizer=tf.keras.regularizers.L1(0.7),
+#                           activity_regularizer=tf.keras.regularizers.L2(0.3)),
+#     tf.keras.layers.LeakyReLU(),
+#     tf.keras.layers.Dense(20),
+# ]
 
 CNN_model = [
     tf.keras.layers.ZeroPadding2D(padding=(3,3), data_format="channels_last", input_shape=(32,60,400)),
@@ -65,7 +297,18 @@ CNN_model = [
 
 # TODO: Hyperparameters settings
 hyperparameters = {
-        "learning_rate": 0.00005,
+        "learning_rate": 0.000005,
         "epochs": 1000,
         "batch_size": 32,
 }
+# hyperparameters = {
+#         "learning_rate": 0.00005,
+#         "epochs": 1000,
+#         "batch_size": 32,
+# }
+
+# hyperparameters = {
+#         "learning_rate": 0.00005,
+#         "epochs": 50,
+#         "batch_size": 32,
+# }

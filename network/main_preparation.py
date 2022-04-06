@@ -41,6 +41,7 @@ def prepare_inputs(numBands: int, load_from_dir: str, group_type:str, seed=None,
     # prepare training dataset and testing dataset based on each class
     in_list_path = []
     # Cubic
+    # [in_list_path.append(f"list/actual/{group_type}_list_{i}.txt") for i in [3,4,5,6,7]
     [in_list_path.append(f"list/actual/{group_type}_list_{i}.txt") for i in range(numClasses)]
     function_list.create_train_and_test_anygroup_file(in_list_path=in_list_path,
                                                       out_training_path="list/actual/train_set.txt",
@@ -48,9 +49,10 @@ def prepare_inputs(numBands: int, load_from_dir: str, group_type:str, seed=None,
 
 
 def test():
-    prepare_inputs(numBands=100,
-                   load_from_dir="../input_data/degeneracy_10_1/",
-                   group_type="layergroup",
+    prepare_inputs(numBands=60,
+                   load_from_dir="../../c2db_database02_output_degeneracy/",
+                #    load_from_dir="../../c2db_database02_output/",
+                   group_type="layers_num",
                    num_upper_bound=1000,
                    num_lower_bound=0,
                    numClasses=20,
@@ -72,3 +74,5 @@ if __name__ == '__main__':
                        num_upper_bound=cfg["num_upper_bound"],
                        num_lower_bound=cfg["num_lower_bound"],
                        seed=cfg["seed"])
+
+    # test()

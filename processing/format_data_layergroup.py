@@ -26,9 +26,33 @@ class LayerBands:
         self.positions = np.array(self.json_data["structure"]["position"])
 
         # need test
-        z_position = np.array([atom_position[2] for atom_position in self.positions])
-        z_position = z_position.round(decimals=2)
-        self.layers_num = len(np.unique(z_position, return_counts=True)[0])  
+        # z_position = np.array([atom_position[2] for atom_position in self.positions])
+        # z_position = z_position.round(decimals=2)
+        z_position = np.array([atom_position[2] for atom_position in self.positions]).round(decimals=2)
+        z_counts = len(np.unique(z_position, return_counts=True)[0])
+
+        self.layers_num = z_counts
+
+        # x_position = np.array([atom_position[0] for atom_position in self.positions]).round(decimals=2)
+        # x_counts = len(np.unique(x_position, return_counts=True)[0])
+        # y_position = np.array([atom_position[1] for atom_position in self.positions]).round(decimals=2)
+        # y_counts = len(np.unique(y_position, return_counts=True)[0])
+        # z_position = np.array([atom_position[2] for atom_position in self.positions]).round(decimals=2)
+        # z_counts = len(np.unique(z_position, return_counts=True)[0])
+        # layers_num = min(x_counts, y_counts, z_counts)
+        # layer_direction = "NA"
+        # if x_counts == layers_num:
+        #     layer_direction = "a"
+        # if y_counts == layers_num:
+        #     layer_direction = "b"
+        # if z_counts == layers_num:
+        #     layer_direction = "c"
+
+        # self.z_layers_num = z_counts
+        # self.layers_num = layers_num
+        # self.layer_direction = layer_direction
+
+        #######
 
         self.spacegroup = self.json_data["structure"]["spacegroup"]
         self.spacegroup_num = self.json_data["structure"]["spacegroup_number"]

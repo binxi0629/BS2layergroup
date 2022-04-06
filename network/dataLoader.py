@@ -82,20 +82,20 @@ class AnyDataset(Dataset):
 #     return validate_loader, train_loader
 
 
-def test():
-    def json2inputlabel(data_json, bands_type="spin up"):
-        _bands_type = {"spin up": "spin_up_bands",
-                       "spin down": "spin_down_bands",
-                       "soc": "soc_bands"}
-        data_input_np = np.array(data_json[_bands_type[bands_type]]).flatten().T  # 4000 x 1
-        data_label_np = np.array([data_json["new_label"]])
-        return data_input_np, data_label_np
+# def test():
+#     def json2inputlabel(data_json, bands_type="spin up"):
+#         _bands_type = {"spin up": "spin_up_bands",
+#                        "spin down": "spin_down_bands",
+#                        "soc": "soc_bands"}
+#         data_input_np = np.array(data_json[_bands_type[bands_type]]).flatten().T  # 4000 x 1
+#         data_label_np = np.array([data_json["new_label"]])
+#         return data_input_np, data_label_np
 
-    file_name = "test.json"
-    with open(file_name, 'r') as f:
-        data = json.load(f)
-    bands, label = json2inputlabel(data)
-    print(bands.shape)
-    print(label)
+#     file_name = "test.json"
+#     with open(file_name, 'r') as f:
+#         data = json.load(f)
+#     bands, label = json2inputlabel(data)
+#     print(bands.shape)
+#     print(label)
 
 # test()

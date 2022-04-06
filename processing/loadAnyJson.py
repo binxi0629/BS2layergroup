@@ -62,7 +62,6 @@ def get_is_spin_polarized(json_data):
     is_sponpolarized = json_data["bands"]["nonsoc_energies"]["is_spinpolarized"]
     return  is_sponpolarized
 
-
 def test01():
 
     test_path = "../c2db_database_test/"

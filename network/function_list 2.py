@@ -38,7 +38,7 @@ def create_valid_list_file(num_bands, in_data_dir, out_list_path,
                 # Set uppper and lower bound to load data
                 count_list[label - 1] += 1
                 if count_list[label - 1] > num_upper_bound:
-                    # print (f"count_list[label - 1] > num_upper_bound    file_name: {file_name}")
+                    print ()
                     continue
                 if count_list[label - 1] < num_lower_bound:
                     continue
@@ -74,8 +74,8 @@ def create_actual_anygroup_list_files(in_list_path, out_list_path_format,num_cla
         with open(file_path, "r") as file:
             data_json = json.load(file)
         
-        # label = data_json["layers_num"]
-        label = data_json["new_label"]
+        label = data_json["layers_num"]
+        # label = data_json["new_label"]
 
         with open(out_list_path_format.format(label), "a") as file_out:
             file_out.write(file_path + "\n")

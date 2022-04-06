@@ -6,6 +6,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 import tensorflow as tf
 from tensorflow.keras import Model
 
+from matplotlib import pyplot as plt
+
 
 def train_it(device, model, save_path,
              epochs, train_loader, test_loader, loss_fn, optimizer,
@@ -62,7 +64,7 @@ def train_it(device, model, save_path,
 
         losses_train.append(train_loss.result())
         accuracy_train.append(train_accuracy.result())
-        print(f'Epoch {epoch + 1} | Loss:   {train_loss.result()} | Accuracy:   {train_accuracy.result() * 100}')
+        print(f'Epoch {epoch + 1} | Loss:   {train_loss.result()} | Accuracy (%):   {train_accuracy.result() * 100}')
 
         if summary:
             with train_summary_writer.as_default():
@@ -82,7 +84,7 @@ def train_it(device, model, save_path,
                 losses_test.append(test_loss.result())
                 accuracy_test.append(test_accuracy.result())
 
-            print(f'\tTest Loss:  {test_loss.result()}  |  Test Accuracy: {test_accuracy.result()*100}')
+            print(f'\tTest Loss:  {test_loss.result()}  |  Test Accuracy (%): {test_accuracy.result()*100}')
 
         # Reset the metrics at the start of next epoch
         train_loss.reset_states()
@@ -91,7 +93,49 @@ def train_it(device, model, save_path,
         test_accuracy.reset_states()
 
     # save model
-    tf.saved_model.save(model, save_path)
+    # tf.saved_model.save(model, save_path)
+    tf.keras.models.save_model(model=model, filepath=save_path)
 
-    return losses_train, accuracy_train, losses_test, accuracy_test
+    return losses_train, accuracy_train, losses_test, accuracy_test, model
 
+def confusion_matrix(labels, predictions, class_names):
+    cm = np.array(tf.math.confusion_matrix(labels=labels, predictions=predictions))
+
+    def plot_confusion_matrix(cm, class_names):
+        """
+        Returns a matplotlib figure containing the plotted confusion matrix.
+
+        Args:
+           cm (array, shape = [n, n]): a confusion matrix of integer classes
+           class_names (array, shape = [n]): String names of the integer classes
+        """
+        plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
+        plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
+
+        figure = plt.figure(figsize=(8, 8), dpi=400)
+        plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+        plt.title("Confusion matrix")
+    #     plt.colorbar()
+        tick_marks = np.arange(len(class_names))
+        plt.xticks(tick_marks, class_names)
+    #     plt.xticks(tick_marks, class_names, rotation=45)
+        plt.yticks(tick_marks, class_names)
+
+
+        # Normalize the confusion matrix.
+        cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+
+        # Use white text if squares are dark; otherwise black.
+        threshold = cm.max() / 2.
+
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                color = "white" if cm[i, j] > threshold else "black"
+                plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
+
+        plt.tight_layout()
+        plt.ylabel('True label')
+        plt.xlabel('Prediction')
+    #     return figure
+    
+    plot_confusion_matrix(cm, class_names)
