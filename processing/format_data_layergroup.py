@@ -8,7 +8,7 @@ from copy import copy,deepcopy
 
 class LayerBands:
 
-    _root_save_path = "../../input_data/energy_separation01/"
+    # _root_save_path = "../../input_data/energy_separation01/"
 
     def __init__(self, jsonbands, file_path):
 
@@ -294,6 +294,24 @@ class LayerBands:
             each_column = []
             for j in range(size[0] - 1):
                 energy = tmp[j + 1][i] - tmp[j][i]
+                each_column.append(energy)
+
+            separation_bands[:, i] = np.array(each_column)
+
+        return separation_bands
+
+    @staticmethod
+    def eigenvalue(formatted_bands, padded_number=0):
+        tmp = formatted_bands
+        size = np.shape(tmp)
+        # print(size)
+        separation_bands = np.zeros((size[0] - 1, size[1])) + padded_number  # -1: difference
+
+        for i in range(size[1]):
+            each_column = []
+            for j in range(size[0] - 1):
+                energy = tmp[j+1][i]
+                # energy = tmp[j + 1][i] - tmp[j][i]
                 each_column.append(energy)
 
             separation_bands[:, i] = np.array(each_column)

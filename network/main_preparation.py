@@ -48,15 +48,15 @@ def prepare_inputs(numBands: int, load_from_dir: str, group_type:str, seed=None,
                                                       out_test_path="list/actual/test_set.txt")
 
 
-def test():
-    prepare_inputs(numBands=60,
-                   load_from_dir="../../c2db_database02_output_degeneracy/",
-                #    load_from_dir="../../c2db_database02_output/",
-                   group_type="layers_num",
-                   num_upper_bound=1000,
-                   num_lower_bound=0,
-                   numClasses=20,
-                   seed=None)
+# def test():
+#     prepare_inputs(numBands=60,
+#                    load_from_dir="../../c2db_database02_output_degeneracy/",
+#                 #    load_from_dir="../../c2db_database02_output/",
+#                    group_type="layers_num",
+#                    num_upper_bound=1000,
+#                    num_lower_bound=0,
+#                    numClasses=20,
+#                    seed=None)
 # test()
 
 

@@ -55,6 +55,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
                num_of_kps=100,  # TODO: Newly added
                degeneracy=False,
                energy_separation=False,
+               eigenvalue=False,
                en_tolerance=0.001,
                padding_around_fermi=False,
                padding_vb_only=False,
@@ -80,6 +81,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
     # need edit name
     layernumber_list, layernumber_population_list = layernumber_filter(layernumber_lower_bound)
+    # print (f"layernumber_list {layernumber_list}\n")
 
     # if debug:
     #     print("No. Valid layer groups: {}".format(len(layergroup_list)))
@@ -152,6 +154,12 @@ def processing(save_dir="../../input_data/energy_separation01/",
                                     norm_after_padding = True
                             tranformed_spinup_bands = format_data_layergroup.LayerBands.energy_separation(spinup_bands, padded_number=padding_num)
                             tranformed_spindown_bands = format_data_layergroup.LayerBands.energy_separation(spindown_bands, padded_number=padding_num)
+
+                        elif eigenvalue:
+                            #TODO:
+                            tranformed_spinup_bands = format_data_layergroup.LayerBands.eigenvalue(spinup_bands, padded_number=padding_num)
+                            tranformed_spindown_bands = format_data_layergroup.LayerBands.eigenvalue(spinup_bands, padded_number=padding_num)
+
                         else:
                             #TODO: new function to be developed here for Spin-coupling effect
                             tranformed_spinup_bands = None
@@ -328,18 +336,19 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
 def test():
     processing(
-               save_dir="../../c2db_database02_output_degeneracy2/",
+               save_dir="../../c2db_database02_output_eigenvalue02/",
                raw_data_dir="../../c2db_database02/",
             #    save_dir="../../c2db_database_test_output/",
             #    raw_data_dir="../../c2db_database_test_input/",
                num_of_bands=60,  # <<<
                num_of_kps=100,  # <<<
-               degeneracy=True,  # <<<
+               degeneracy=False,  # <<<
                energy_separation=False, # <<<
+               eigenvalue=True,
                en_tolerance=0.0005, # <<<
                padding_around_fermi=True,
                padding_vb_only=False,
-               padding_num=-15,  # <<<
+               padding_num=-100,  # <<<
                is_soc=False,
                bands_below_fermi_limit=40,  # <<<
                layer_norm=True,  # <<<

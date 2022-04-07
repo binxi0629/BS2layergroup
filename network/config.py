@@ -5,12 +5,13 @@ args = {
             "start": True,
             "numBands": 60,
             # "load_from_dir": "../input_data/energy_separation03/",
-            "load_from_dir": "../../c2db_database02_output_degeneracy/",
+            # "load_from_dir": "../../c2db_database02_output_degeneracy/",
+            "load_from_dir": "../../c2db_database02_output_eigenvalue02/",
             # "group_type": "layernumbers",
             "group_type": "new_label", # for file naming only
             "numClasses": 5,
-            "num_upper_bound": 1000,
-            # "num_upper_bound": 200,
+            # "num_upper_bound": 1000,
+            "num_upper_bound": 200,
             "num_lower_bound": 0,
             "seed": None,
         }
@@ -298,7 +299,7 @@ CNN_model = [
 # TODO: Hyperparameters settings
 hyperparameters = {
         "learning_rate": 0.000005,
-        "epochs": 1000,
+        "epochs": 300,
         "batch_size": 32,
 }
 # hyperparameters = {

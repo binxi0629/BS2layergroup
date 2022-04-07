@@ -6,7 +6,6 @@ import tqdm
 
 import crystal
 
-
 def create_valid_list_file(num_bands, in_data_dir, out_list_path,
                            seed=None, num_upper_bound=500, num_lower_bound=0,
                            spin="spin up", valid_classes=20):
@@ -23,6 +22,7 @@ def create_valid_list_file(num_bands, in_data_dir, out_list_path,
     for count in range(valid_classes):
         count_list.append(0)
 
+    IndexErrorCount = 0
     for root, dirs, file_names in os.walk(in_data_dir):  # loop through file names in a directory
         for i, file_name in enumerate(file_names):
 
@@ -36,15 +36,26 @@ def create_valid_list_file(num_bands, in_data_dir, out_list_path,
 
                 label = data_json["new_label"]
                 # Set uppper and lower bound to load data
-                count_list[label - 1] += 1
+                try:
+                    # count_list[label-2] += 1
+                    count_list[label - 1] += 1
+                except IndexError:
+                    print(f"IndexError {file_name}")
+                    IndexErrorCount+=1
+                    continue
+
                 if count_list[label - 1] > num_upper_bound:
+                # if count_list[label - 2] > num_upper_bound:
                     # print (f"count_list[label - 1] > num_upper_bound    file_name: {file_name}")
                     continue
                 if count_list[label - 1] < num_lower_bound:
+                # if count_list[label - 2] < num_lower_bound:
                     continue
 
                 valid_file_names.append(file_name)
                 print("\r\tcreate valid list: {}/{}".format(i, len(file_names)), end="")
+
+    print(f"\nIndexErrorCount {IndexErrorCount}")
 
     # random shuffle dataset
     if seed is not None:
@@ -54,6 +65,66 @@ def create_valid_list_file(num_bands, in_data_dir, out_list_path,
         for file_name in valid_file_names:
             file_out.write(in_data_dir + file_name + "\n")  # write data_file_paths
     print("\rcreate valid list: {}".format(len(open(out_list_path).readlines())))
+
+# def create_valid_list_file(num_bands, in_data_dir, out_list_path,
+#                            seed=None, num_upper_bound=500, num_lower_bound=0,
+#                            spin="spin up", valid_classes=20):
+
+#     _bands_type={"spin up":"spin_up_bands",
+#                  "spin down": "spin_down_bands",
+#                  "soc": "soc_bands"}
+
+#     bands_loc = _bands_type[spin]
+
+#     print("\tcreate valid list:", end="")
+#     valid_file_names = []
+#     count_list = []
+#     for count in range(valid_classes):
+#         count_list.append(0)
+
+#     IndexErrorCount = 0
+#     for root, dirs, file_names in os.walk(in_data_dir):  # loop through file names in a directory
+#         for i, file_name in enumerate(file_names):
+
+#             if ".json" in file_name:
+#                 with open(os.path.join(in_data_dir,file_name), "r") as file:
+#                     data_json = json.load(file)
+
+#                 # (No.bands x No.kps) accept only data with certain number of bands
+#                 if np.array(data_json[bands_loc]).shape[0] != num_bands:
+#                     continue
+
+#                 label = data_json["new_label"]
+#                 # Set uppper and lower bound to load data
+#                 try:
+#                     count_list[label-2] += 1
+#                     # count_list[label - 1] += 1
+#                 except IndexError:
+#                     print(f"IndexError {file_name}")
+#                     IndexErrorCount+=1
+#                     continue
+
+#                 # if count_list[label - 1] > num_upper_bound:
+#                 if count_list[label-2] > num_upper_bound:
+#                     # print (f"count_list[label - 1] > num_upper_bound    file_name: {file_name}")
+#                     continue
+#                 if count_list[label-2] < num_lower_bound:
+#                 # if count_list[label - 1] < num_lower_bound:
+#                     continue
+
+#                 valid_file_names.append(file_name)
+#                 print("\r\tcreate valid list: {}/{}".format(i, len(file_names)), end="")
+
+#     print(f"\nIndexErrorCount {IndexErrorCount}")
+
+#     # random shuffle dataset
+#     if seed is not None:
+#         np.random.seed(seed)
+#     np.random.shuffle(valid_file_names)  # randomize order of data
+#     with open(out_list_path, "w") as file_out:
+#         for file_name in valid_file_names:
+#             file_out.write(in_data_dir + file_name + "\n")  # write data_file_paths
+#     print("\rcreate valid list: {}".format(len(open(out_list_path).readlines())))
 
 
 def create_empty_list_files(out_num_group, out_list_path_format):
