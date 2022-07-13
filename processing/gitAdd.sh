@@ -1,3 +1,3 @@
 #!/bin/bash
 
-git add *.py *.sh
+git add *.py *.sh *.json *.md

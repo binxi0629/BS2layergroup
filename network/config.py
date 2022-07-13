@@ -6,7 +6,7 @@ args = {
             "numBands": 60,
             # "load_from_dir": "../input_data/energy_separation03/",
             # "load_from_dir": "../../c2db_database02_output_degeneracy/",
-            "load_from_dir": "../../c2db_database02_output_eigenvalue02/",
+            "load_from_dir": "../../c2db_database02_output_eigenvalue_norm/",
             # "group_type": "layernumbers",
             "group_type": "new_label", # for file naming only
             "numClasses": 5,

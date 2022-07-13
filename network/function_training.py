@@ -48,7 +48,7 @@ def train_it(device, model, save_path,
     # summary
     print(model.summary())
     if summary:
-        current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M")
         train_log_dir = 'logs/gradient_tape/'+current_time+'/train'
         test_log_dir = 'logs/gradient_tape/'+current_time+'/test'
         train_summary_writer = tf.summary.create_file_writer(train_log_dir)

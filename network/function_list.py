@@ -40,7 +40,7 @@ def create_valid_list_file(num_bands, in_data_dir, out_list_path,
                     # count_list[label-2] += 1
                     count_list[label - 1] += 1
                 except IndexError:
-                    print(f"IndexError {file_name}")
+                    # print(f"\nIndexError {file_name}")
                     IndexErrorCount+=1
                     continue
 

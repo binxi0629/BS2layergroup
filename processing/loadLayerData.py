@@ -82,6 +82,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
     # need edit name
     layernumber_list, layernumber_population_list = layernumber_filter(layernumber_lower_bound)
     # print (f"layernumber_list {layernumber_list}\n")
+    # print (f"layernumber_list {layernumber_list.index(3)}\n")
 
     # if debug:
     #     print("No. Valid layer groups: {}".format(len(layergroup_list)))
@@ -157,6 +158,13 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
                         elif eigenvalue:
                             #TODO:
+                            if layer_norm:
+                                if norm_before_padding:
+                                    # normalize the energy difference to a scale
+                                    spinup_bands = layerNorm(spinup_bands, energy_scale, shift=shift)
+                                    spindown_bands = layerNorm(spindown_bands, energy_scale, shift=shift)
+                                else:
+                                    norm_after_padding = True
                             tranformed_spinup_bands = format_data_layergroup.LayerBands.eigenvalue(spinup_bands, padded_number=padding_num)
                             tranformed_spindown_bands = format_data_layergroup.LayerBands.eigenvalue(spinup_bands, padded_number=padding_num)
 
@@ -336,7 +344,7 @@ def processing(save_dir="../../input_data/energy_separation01/",
 
 def test():
     processing(
-               save_dir="../../c2db_database02_output_eigenvalue02/",
+               save_dir="../../c2db_database02_output_eigenvalue_norm/",
                raw_data_dir="../../c2db_database02/",
             #    save_dir="../../c2db_database_test_output/",
             #    raw_data_dir="../../c2db_database_test_input/",
@@ -353,7 +361,7 @@ def test():
                bands_below_fermi_limit=40,  # <<<
                layer_norm=True,  # <<<
                layergroup_lower_bound=10,  # <<<
-               layernumber_lower_bound=-1,
+               layernumber_lower_bound=200,
                energy_scale=10.,  # <<<
                shift=1.,  # <<<
                kpaths_shuffle=True,  # <<<
