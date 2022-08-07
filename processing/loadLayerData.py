@@ -205,7 +205,6 @@ def processing(save_dir="../../input_data/energy_separation01/",
                             print("kps:", kps_list)
                     else:
                         kps_list = format_data_layergroup.LayerBands.unrollKpath(kpaths)
-
                     padded_spinup_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spinup_bands, kps_list)
                     padded_spindown_bands = format_data_layergroup.LayerBands.extractBandsByKpsIdx(padded_spindown_bands, kps_list)
 
@@ -304,37 +303,37 @@ def test():
                norm_before_padding=True,
                debug=True)
 
-test()
+# test()
 
 
-# if __name__ == "__main__":
-#
-#     # load parameters from config.py
-#     # TODO: The parameters are loaded from config.py, please change the parameters there
-#
-#     print("Loading...")
-#
-#     from config import args
-#     if args['process']['start']:
-#         cfg = args['process']['parameters']
-#         processing(save_dir=cfg["save_to_directory"],
-#                    raw_data_dir=cfg["raw_data_directory"],
-#                    degeneracy=cfg['degeneracy'],
-#                    energy_separation=cfg["energy_separation"],
-#                    en_tolerance=cfg['en_tolerance'],
-#                    padding_around_fermi=cfg['padding_around_fermi'],
-#                    padding_vb_only=cfg['padding_vb_only'],
-#                    padding_num=cfg["padding_num"],
-#                    is_soc=cfg["is_soc"],
-#                    num_of_bands=cfg['num_of_bands'],
-#                    bands_below_fermi_limit=cfg['bands_below_fermi_limit'],
-#                    layer_norm=cfg["layer_norm"],
-#                    num_of_kps=cfg["num_of_kps"],
-#                    layergroup_lower_bound=cfg["layergroup_lower_bound"],
-#                    energy_scale=cfg["energy_scale"],
-#                    shift =cfg["shift"],
-#                    norm_before_padding=cfg["norm_before_padding"],
-#                    kpaths_shuffle=cfg["kpaths_shuffle"],
-#                    do_agumentation=cfg["do_agumentation"],
-#                    agmentation_class_limit=cfg["agmentation_class_limit"],
-#                    ag_shiftting_rate=cfg["ag_shiftting_rate"])
+if __name__ == "__main__":
+
+    # load parameters from config.py
+    # TODO: The parameters are loaded from config.py, please change the parameters there
+
+    print("Loading...")
+
+    from config import args
+    if args['process']['start']:
+        cfg = args['process']['parameters']
+        processing(save_dir=cfg["save_to_directory"],
+                   raw_data_dir=cfg["raw_data_directory"],
+                   degeneracy=cfg['degeneracy'],
+                   energy_separation=cfg["energy_separation"],
+                   en_tolerance=cfg['en_tolerance'],
+                   padding_around_fermi=cfg['padding_around_fermi'],
+                   padding_vb_only=cfg['padding_vb_only'],
+                   padding_num=cfg["padding_num"],
+                   is_soc=cfg["is_soc"],
+                   num_of_bands=cfg['num_of_bands'],
+                   bands_below_fermi_limit=cfg['bands_below_fermi_limit'],
+                   layer_norm=cfg["layer_norm"],
+                   num_of_kps=cfg["num_of_kps"],
+                   layergroup_lower_bound=cfg["layergroup_lower_bound"],
+                   energy_scale=cfg["energy_scale"],
+                   shift =cfg["shift"],
+                   norm_before_padding=cfg["norm_before_padding"],
+                   kpaths_shuffle=cfg["kpaths_shuffle"],
+                   do_agumentation=cfg["do_agumentation"],
+                   agmentation_class_limit=cfg["agmentation_class_limit"],
+                   ag_shiftting_rate=cfg["ag_shiftting_rate"])

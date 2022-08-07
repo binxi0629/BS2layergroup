@@ -1,3 +1,6 @@
+import random
+import re, copy
+
 import numpy as np
 import json, os
 
@@ -105,4 +108,49 @@ def test02():
     data_statistic(json_data)
 
 
-test02()
+# test02()
+def get_json_from_path(json_path):
+    with open(json_path, 'r') as f:
+        json_data = json.load(f)
+    return json_data
+
+
+def labes2labe_list(labels:str):
+    # labels = "GYHCH1XG"
+    label_list = re.findall("\w\d|\w", labels)
+    print(label_list)
+    return label_list
+
+
+def test03(file_name="test02.json"):
+    json_data = get_json_from_path(file_name)
+
+    from format_data_layergroup import LayerBands
+    tmp_example = LayerBands(json_data,"t1")
+    bands = tmp_example.spinup_bands # 400 x no. bands
+    print(">>>",bands.shape)
+    print(tmp_example.labels_idx)
+
+    a = tmp_example.special_kps_separation(100)
+    print(a)
+    b = copy.deepcopy(a)
+
+    LayerBands.kpath_shuffle(b)
+    print(b)
+    for i in range(len(a)):
+        print(len(a[i]))
+
+    paths = LayerBands.produceNewKpsIdxFromShuffledKpath(b, 3, shiftting_rate=0.3)
+    for i in range(len(paths)):
+        print("before shuffle:", paths[i])
+        LayerBands.kpath_shuffle(paths[i])
+        print("after shufffle:", paths[i])
+        kps_list = LayerBands.unrollKpath(paths[i])
+        print("len:", len(kps_list))
+        extraced_bands = LayerBands.extractBandsByKpsIdx(bands.T,kps_list)
+        print(extraced_bands.shape)
+
+test03("test.json")
+test03()
+
+

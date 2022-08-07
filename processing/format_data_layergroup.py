@@ -24,12 +24,6 @@ class LayerBands:
         self.formula = self.json_data["structure"]["formula"]
         self.atoms_type = self.json_data["structure"]["atom_types"]
         self.positions = np.array(self.json_data["structure"]["position"])
-
-        # need test
-        z_position = np.array([atom_position[2] for atom_position in self.positions])
-        z_position = z_position.round(decimals=2)
-        self.layers_num = len(np.unique(z_position, return_counts=True)[0])  
-
         self.spacegroup = self.json_data["structure"]["spacegroup"]
         self.spacegroup_num = self.json_data["structure"]["spacegroup_number"]
         self.lattice = self.json_data["structure"]["lattice"]
@@ -129,22 +123,22 @@ class LayerBands:
 
             return idx_list
 
-        def default_strategy(required_num, total=400):
+        def default_strategy(required_num,total=400):
             """
                 Weighted shrinking for each path
             """
             tmp = []
             tmp_sum = 0
-            no_path_cases = 0
+            no_path_cases=0
 
-            for k in range(num_paths - 1):
-                tmp_val = int(required_num * (self.labels_idx[k + 1][1] - self.labels_idx[k][1]) / total)
-                if 0 == tmp_val:
-                    no_path_cases += 1
+            for k in range(num_paths-1):
+                tmp_val=int(required_num*(self.labels_idx[k+1][1]-self.labels_idx[k][1])/total)
+                if 0==tmp_val:
+                    no_path_cases +=1
                 tmp.append(tmp_val)
-                tmp_sum += tmp_val
+                tmp_sum+=tmp_val
 
-            tmp.append(required_num - tmp_sum)
+            tmp.append(required_num-tmp_sum)
 
             for _ in range(no_path_cases):
                 tmp[tmp.index(max(tmp))] -= 1
@@ -154,7 +148,7 @@ class LayerBands:
         kps_idx = []
 
         num_idx_list=default_strategy(num_kps)
-
+        # print(">>>",num_idx_list)
         for j in range(num_paths):
             kps_idx.append(equalInervalIdxSplitting(start_idx=self.labels_idx[j][1], end_idx=self.labels_idx[j+1][1], num_idx=num_idx_list[j]))
 
@@ -327,11 +321,12 @@ class LayerBands:
 
     @staticmethod
     def find_fermi_index(formatted_bands):
-        tmp =formatted_bands
+        tmp =np.array(formatted_bands)
         # count bands number
-        bands_num = np.shape(tmp)[0]
+        bands_num = tmp.shape[0]
 
         for j in range(bands_num-1):
+            # print(tmp[j][0], tmp[j + 1][0])
             if (tmp[j][0]) * (tmp[j + 1][0]) <= 0:
                 fermi_index = j
                 # print(j)
