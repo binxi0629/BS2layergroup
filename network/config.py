@@ -3,15 +3,35 @@
 args = {
         "load": {
             "start": True,
-            "numBands": 60,
+
+            ########################
+
+            # "numBands": 40,
+            # "load_from_dir": "../../c2db_database02_output_eigenvalue_norm_40x400/",   #40*400
+            # # "numClasses": 5,
+
+            ########################
+
+            # "numBands": 60,
             # "load_from_dir": "../input_data/energy_separation03/",
             # "load_from_dir": "../../c2db_database02_output_degeneracy/",
-            "load_from_dir": "../../c2db_database02_output_eigenvalue_norm/",
+            # "load_from_dir": "../../c2db_database02_output_eigenvalue_norm/", 60*100
+            # "numClasses": 5,
+
+            ########################
+
+            "numBands": 40,
+            "load_from_dir": "../../c2db_database02_output_eigenvalue_norm_40x400_9classes_augmentation/",
+            # "load_from_dir": "../../c2db_database02_output_eigenvalue_norm_40x400_9classes/",   #40*400
+            "numClasses": 9,
+
+            ########################
+
             # "group_type": "layernumbers",
             "group_type": "new_label", # for file naming only
-            "numClasses": 5,
-            # "num_upper_bound": 1000,
-            "num_upper_bound": 200,
+            # "numClasses": 5,
+            "num_upper_bound": 130,
+            # "num_upper_bound": 200,
             "num_lower_bound": 0,
             "seed": None,
         }
